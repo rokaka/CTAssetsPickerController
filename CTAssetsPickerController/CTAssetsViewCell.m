@@ -84,13 +84,28 @@ static UIColor *disabledColor;
 - (void)bind:(ALAsset *)asset
 {
     self.asset  = asset;
-    self.image  = (asset.thumbnail == NULL) ? [UIImage ctassetsPickerControllerImageNamed:@"CTAssetsPickerEmptyCell"] : [UIImage imageWithCGImage:asset.thumbnail];
-    
+    UIImage *image  = (asset.aspectRatioThumbnail == NULL) ? [UIImage ctassetsPickerControllerImageNamed:@"CTAssetsPickerEmptyCell"] : [UIImage imageWithCGImage:asset.aspectRatioThumbnail];
+    self.image = [self image:image scaledToSize:CGSizeMake(150, 150)];
     if ([self.asset isVideo])
     {
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
         self.title = [df stringFromTimeInterval:[[asset valueForProperty:ALAssetPropertyDuration] doubleValue]];
     }
+}
+
+- (UIImage *)image:(UIImage *)img scaledToSize:(CGSize)size {
+    //create drawing context
+    UIGraphicsBeginImageContextWithOptions(size, NO, 0.0f);
+    
+    //draw
+    [img drawInRect:CGRectMake(0.0f, 0.0f, size.width, size.height)];
+    
+    //capture resultant image
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    //return image
+    return image;
 }
 
 - (void)setSelected:(BOOL)selected
